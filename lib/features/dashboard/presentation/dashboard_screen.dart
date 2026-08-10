@@ -9,6 +9,7 @@ import 'dashboard_controller.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/dashboard_metrics_grid.dart';
 import 'widgets/low_stock_quick_view.dart';
+import 'widgets/quick_actions_row.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -75,7 +76,7 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                   ),
                   const SizedBox(height: 24),
-                  _QuickActionsRow(isDark: isDark),
+                  QuickActionsRow(isDark: isDark),
                   const SizedBox(height: 24),
                   LowStockQuickView(products: state.lowStockProducts),
                 ],
@@ -84,53 +85,6 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _QuickActionsRow extends StatelessWidget {
-  final bool isDark;
-
-  const _QuickActionsRow({required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Operations',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () => context.go(AppRoutes.pos),
-                icon: const Icon(Icons.add_shopping_cart_rounded),
-                label: const Text('Open POS Cart'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => context.go(AppRoutes.products),
-                icon: const Icon(Icons.inventory_2_outlined),
-                label: const Text('Manage Products'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => context.go(AppRoutes.inventory),
-                icon: const Icon(Icons.warehouse_outlined),
-                label: const Text('Stock Inventory'),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
