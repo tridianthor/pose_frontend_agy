@@ -16,46 +16,60 @@ class DashboardHeader extends ConsumerWidget {
     final role = authState.role ?? 'Cashier';
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome back, $username 👋',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    role.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppTheme.primaryColor,
-                      fontSize: 11,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome back,',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
+              ),
+              Text(
+                '$username 👋',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      role.toUpperCase(),
+                      style: const TextStyle(
+                        color: AppTheme.primaryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Operational Overview',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Operational Overview',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
               tooltip: 'Refresh Dashboard',
