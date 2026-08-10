@@ -40,18 +40,19 @@ void main() {
   );
 }
 
-class PoseApp extends StatelessWidget {
+class PoseApp extends ConsumerWidget {
   const PoseApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: 'Simple POS & Inventory',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      routerConfig: AppRouter.router,
+      routerConfig: router,
     );
   }
 }

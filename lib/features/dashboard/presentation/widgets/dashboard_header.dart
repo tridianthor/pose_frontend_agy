@@ -111,9 +111,6 @@ class DashboardHeader extends ConsumerWidget {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 await ref.read(authStateProvider.notifier).logout();
-                if (context.mounted) {
-                  context.go(AppRoutes.login);
-                }
               },
               child: const Text('Logout'),
             ),

@@ -6,10 +6,6 @@ import '../../../core/network/api_endpoints.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../domain/auth_state.dart';
 
-final secureStorageProvider = Provider<SecureStorageService>((ref) {
-  return SecureStorageService();
-});
-
 final authStateProvider =
     StateNotifierProvider<LoginController, AuthState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -22,14 +18,18 @@ class LoginController extends StateNotifier<AuthState> {
   final SecureStorageService secureStorage;
 
   LoginController(this.apiClient, this.secureStorage)
-      : super(const AuthState());
+      : super(const AuthState()) {
+    checkAuthStatus();
+  }
 
   Future<void> checkAuthStatus() async {
     final token = await secureStorage.getAccessToken();
     final role = await secureStorage.getUserRole();
+    final username = await secureStorage.getUsername();
     if (token != null && token.isNotEmpty) {
       state = state.copyWith(
         status: AuthStatus.authenticated,
+        username: username ?? 'User',
         role: role ?? 'Cashier',
       );
     } else {
@@ -61,6 +61,7 @@ class LoginController extends StateNotifier<AuthState> {
           await secureStorage.saveRefreshToken(refreshToken);
         }
         await secureStorage.saveUserRole(userRole);
+        await secureStorage.saveUsername(username);
 
         state = state.copyWith(
           status: AuthStatus.authenticated,

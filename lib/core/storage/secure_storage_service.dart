@@ -1,4 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final secureStorageProvider = Provider<SecureStorageService>((ref) {
+  return SecureStorageService();
+});
 
 class StorageKeys {
   static const String accessToken = 'access_token';
@@ -62,6 +67,15 @@ class SecureStorageService {
 
   Future<String?> getUserRole() async {
     return await read(StorageKeys.userRole);
+  }
+
+  // Username Helpers
+  Future<void> saveUsername(String username) async {
+    await write(StorageKeys.username, username);
+  }
+
+  Future<String?> getUsername() async {
+    return await read(StorageKeys.username);
   }
 
   // Clear Session

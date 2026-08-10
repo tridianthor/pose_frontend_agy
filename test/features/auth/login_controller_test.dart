@@ -72,20 +72,32 @@ void main() {
     controller = LoginController(mockApiClient, mockSecureStorage);
   });
 
-  test('Initial state is AuthStatus.initial', () {
-    expect(controller.state.status, equals(AuthStatus.initial));
+  test('Initial state checks auth status from storage', () async {
+    final storage = MockSecureStorage();
+    await storage.saveAccessToken('existing_token');
+    await storage.saveUserRole('Manager');
+    await storage.saveUsername('stored_user');
+
+    final newController = LoginController(mockApiClient, storage);
+    await Future.delayed(Duration.zero);
+
+    expect(newController.state.status, equals(AuthStatus.authenticated));
+    expect(newController.state.username, equals('stored_user'));
+    expect(newController.state.role, equals('Manager'));
   });
 
-  test('Successful login updates state to authenticated and saves tokens', () async {
+  test('Successful login updates state to authenticated and saves tokens and username', () async {
     mockApiClient.shouldSucceed = true;
 
     final result = await controller.login('admin', 'password123');
 
     expect(result, isTrue);
     expect(controller.state.status, equals(AuthStatus.authenticated));
+    expect(controller.state.username, equals('admin'));
     expect(controller.state.role, equals('Admin'));
     expect(await mockSecureStorage.getAccessToken(), equals('mock_access_token'));
     expect(await mockSecureStorage.getRefreshToken(), equals('mock_refresh_token'));
+    expect(await mockSecureStorage.getUsername(), equals('admin'));
   });
 
   test('Failed login updates state to error with AuthFailure', () async {
@@ -100,9 +112,11 @@ void main() {
 
   test('Logout clears session storage and resets state to unauthenticated', () async {
     await mockSecureStorage.saveAccessToken('token');
+    await mockSecureStorage.saveUsername('admin');
     await controller.logout();
 
     expect(controller.state.status, equals(AuthStatus.unauthenticated));
     expect(await mockSecureStorage.getAccessToken(), isNull);
+    expect(await mockSecureStorage.getUsername(), isNull);
   });
 }

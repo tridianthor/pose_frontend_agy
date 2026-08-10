@@ -92,8 +92,15 @@ class DashboardController extends StateNotifier<DashboardState> {
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.connectionError) {
         failure = const NetworkFailure();
+      } else if (e.response?.statusCode == 401) {
+        failure = const AuthFailure(message: 'Session expired or unauthorized. Please log in again.');
       } else {
-        failure = ServerFailure(message: e.message ?? 'Failed to load dashboard data.');
+        failure = ServerFailure(
+          message: e.response?.data?['detail'] ??
+              (e.response?.statusCode != null
+                  ? 'Server error (${e.response?.statusCode}).'
+                  : 'Failed to load dashboard data.'),
+        );
       }
       state = state.copyWith(isLoading: false, failure: failure);
     } catch (e) {

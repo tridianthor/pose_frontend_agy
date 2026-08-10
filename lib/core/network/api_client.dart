@@ -1,9 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'api_endpoints.dart';
-import 'retry_interceptor.dart';
+import 'package:pose_frontend/core/network/api_endpoints.dart';
+import 'package:pose_frontend/core/network/auth_interceptor.dart';
+import 'package:pose_frontend/core/network/idempotency_interceptor.dart';
+import 'package:pose_frontend/core/network/retry_interceptor.dart';
+import 'package:pose_frontend/core/storage/secure_storage_service.dart';
+
+final onUnauthenticatedCallbackProvider = Provider<void Function()?>((ref) => null);
 
 final dioProvider = Provider<Dio>((ref) {
+  final secureStorage = ref.watch(secureStorageProvider);
+  final onUnauthenticated = ref.watch(onUnauthenticatedCallbackProvider);
   final dio = Dio(
     BaseOptions(
       baseUrl: ApiEndpoints.baseUrl,
@@ -16,7 +23,17 @@ final dioProvider = Provider<Dio>((ref) {
       },
     ),
   );
-  dio.interceptors.add(RetryInterceptor(dio: dio));
+
+  dio.interceptors.addAll([
+    AuthInterceptor(
+      secureStorage: secureStorage,
+      dio: dio,
+      onUnauthenticated: onUnauthenticated,
+    ),
+    IdempotencyInterceptor(),
+    RetryInterceptor(dio: dio),
+  ]);
+
   return dio;
 });
 
