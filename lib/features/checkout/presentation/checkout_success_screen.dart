@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../sales/domain/sale_model.dart';
+import 'checkout_controller.dart';
 
-class CheckoutSuccessScreen extends StatelessWidget {
+class CheckoutSuccessScreen extends ConsumerWidget {
   final SaleModel sale;
 
   const CheckoutSuccessScreen({super.key, required this.sale});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -82,15 +84,23 @@ class CheckoutSuccessScreen extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
+                              ref.read(checkoutControllerProvider.notifier).resetCheckout();
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              }
                               context.go(AppRoutes.sales);
                             },
-                            child: const Text('View Sales Log'),
+                            child: const Text('Sales Log'),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
+                              ref.read(checkoutControllerProvider.notifier).resetCheckout();
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              }
                               context.go(AppRoutes.pos);
                             },
                             child: const Text('New Sale'),
