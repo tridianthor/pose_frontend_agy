@@ -53,7 +53,7 @@ class DashboardMetricsGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final card = cards[index];
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(14),
           decoration: AppTheme.glassDecoration(isDark: isDark),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

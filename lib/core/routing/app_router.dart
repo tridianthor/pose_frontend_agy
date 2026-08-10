@@ -26,39 +26,13 @@ class AppRoutes {
   static const String users = '/users';
 }
 
-class AuthListenable extends ChangeNotifier {
-  AuthState _state;
-  AuthListenable(this._state);
-
-  AuthState get state => _state;
-
-  void update(AuthState newState) {
-    if (_state != newState) {
-      _state = newState;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifyListeners();
-      });
-    }
-  }
-}
-
-final authListenableProvider = Provider<AuthListenable>((ref) {
-  final listenable = AuthListenable(ref.read(authStateProvider));
-  ref.listen<AuthState>(authStateProvider, (_, next) {
-    listenable.update(next);
-  });
-  return listenable;
-});
-
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authListenable = ref.watch(authListenableProvider);
+  final authState = ref.watch(authStateProvider);
 
   return GoRouter(
     navigatorKey: AppRouter.rootNavigatorKey,
-    refreshListenable: authListenable,
     initialLocation: AppRoutes.login,
     redirect: (context, state) {
-      final authState = authListenable.state;
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
 
       if (authState.status == AuthStatus.initial) {

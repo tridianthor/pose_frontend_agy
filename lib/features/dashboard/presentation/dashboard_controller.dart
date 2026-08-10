@@ -95,12 +95,13 @@ class DashboardController extends StateNotifier<DashboardState> {
       } else if (e.response?.statusCode == 401) {
         failure = const AuthFailure(message: 'Session expired or unauthorized. Please log in again.');
       } else {
-        failure = ServerFailure(
-          message: e.response?.data?['detail'] ??
-              (e.response?.statusCode != null
-                  ? 'Server error (${e.response?.statusCode}).'
-                  : 'Failed to load dashboard data.'),
-        );
+        final data = e.response?.data;
+        final message = (data is Map<String, dynamic> && data['detail'] is String)
+            ? data['detail'] as String
+            : (e.response?.statusCode != null
+                ? 'Server error (${e.response?.statusCode}).'
+                : 'Failed to load dashboard data.');
+        failure = ServerFailure(message: message);
       }
       state = state.copyWith(isLoading: false, failure: failure);
     } catch (e) {
