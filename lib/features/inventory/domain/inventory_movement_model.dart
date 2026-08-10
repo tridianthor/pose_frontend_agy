@@ -39,17 +39,26 @@ class InventoryMovementModel {
       return DateTime.now();
     }
 
+    String? parseString(dynamic val) {
+      if (val == null) return null;
+      if (val is String) return val;
+      if (val is Map) {
+        return val['username']?.toString() ?? val['name']?.toString();
+      }
+      return null;
+    }
+
     return InventoryMovementModel(
       id: parseInt(json['id']),
       createdAt: parseDate(json['created_at'] ?? json['createdAt']),
       productId: parseInt(json['product'] ?? json['product_id']),
-      productName: json['product_name'] as String? ?? '',
-      movementType: json['movement_type'] as String? ?? json['type'] as String? ?? 'ADJUSTMENT',
+      productName: json['product_name']?.toString() ?? (json['product'] is Map ? json['product']['name']?.toString() ?? '' : ''),
+      movementType: json['movement_type']?.toString() ?? json['type']?.toString() ?? 'ADJUSTMENT',
       quantity: parseInt(json['quantity']),
       previousStock: parseInt(json['previous_stock'] ?? json['prevStock']),
       resultingStock: parseInt(json['resulting_stock'] ?? json['resultingStock']),
-      userName: json['user_name'] as String? ?? json['user'] as String?,
-      reason: json['reason'] as String?,
+      userName: parseString(json['user_name']) ?? parseString(json['user']),
+      reason: json['reason']?.toString(),
     );
   }
 

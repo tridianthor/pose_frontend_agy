@@ -30,11 +30,20 @@ class SaleItemModel {
       return int.tryParse(val.toString()) ?? 0;
     }
 
+    String parseString(dynamic val, [String fallback = '']) {
+      if (val == null) return fallback;
+      if (val is String) return val;
+      if (val is Map) {
+        return val['name']?.toString() ?? val['product_name']?.toString() ?? fallback;
+      }
+      return val.toString();
+    }
+
     return SaleItemModel(
       id: json['id'] != null ? parseInt(json['id']) : null,
       productId: parseInt(json['product'] ?? json['product_id']),
-      productName: json['product_name'] as String? ?? json['name'] as String? ?? '',
-      sku: json['sku'] as String? ?? '',
+      productName: parseString(json['product_name'] ?? json['name'] ?? json['product']),
+      sku: parseString(json['sku']),
       unitPrice: parseDouble(json['unit_price'] ?? json['price']),
       quantity: parseInt(json['quantity'] ?? json['qty']),
       subtotal: parseDouble(json['subtotal']),

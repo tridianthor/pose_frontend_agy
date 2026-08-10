@@ -75,25 +75,37 @@ class SaleModel {
       return DateTime.now();
     }
 
+    String? parseString(dynamic val) {
+      if (val == null) return null;
+      if (val is String) return val;
+      if (val is Map) {
+        return val['name']?.toString() ?? val['username']?.toString() ?? val['title']?.toString();
+      }
+      return null;
+    }
+
     final rawItems = json['items'] as List<dynamic>? ?? [];
+
+    final rawCustomerId = json['customer_id'] ?? (json['customer'] is int ? json['customer'] : (json['customer'] is Map ? json['customer']['id'] : null));
+    final rawPaymentId = json['payment_method_id'] ?? json['paymentMethodId'] ?? (json['payment_method'] is int ? json['payment_method'] : (json['payment_method'] is Map ? json['payment_method']['id'] : null));
 
     return SaleModel(
       id: parseInt(json['id']),
-      transactionNumber: json['transaction_number'] as String? ?? json['transactionNumber'] as String? ?? '',
+      transactionNumber: json['transaction_number']?.toString() ?? json['transactionNumber']?.toString() ?? '',
       createdAt: parseDate(json['created_at'] ?? json['createdAt']),
-      cashierName: json['cashier_name'] as String? ?? json['cashier'] as String?,
-      customerId: json['customer_id'] != null ? parseInt(json['customer_id']) : null,
-      customerName: json['customer_name'] as String? ?? json['customer'] as String?,
-      paymentMethodId: parseInt(json['payment_method_id'] ?? json['paymentMethodId'] ?? json['payment_method']),
-      paymentMethodName: json['payment_method_name'] as String? ?? json['paymentMethodName'] as String?,
+      cashierName: parseString(json['cashier_name']) ?? parseString(json['cashier']),
+      customerId: rawCustomerId != null ? parseInt(rawCustomerId) : null,
+      customerName: parseString(json['customer_name']) ?? parseString(json['customer']),
+      paymentMethodId: parseInt(rawPaymentId),
+      paymentMethodName: parseString(json['payment_method_name']) ?? parseString(json['paymentMethodName']) ?? parseString(json['payment_method']),
       subtotal: parseDouble(json['subtotal']),
       discount: parseDouble(json['discount']),
       tax: parseDouble(json['tax']),
       total: parseDouble(json['total']),
       amountPaid: parseDouble(json['amount_paid'] ?? json['amountPaid']),
       change: parseDouble(json['change']),
-      status: json['status'] as String? ?? 'COMPLETED',
-      items: rawItems.map((item) => SaleItemModel.fromJson(item)).toList(),
+      status: json['status']?.toString() ?? 'COMPLETED',
+      items: rawItems.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>)).toList(),
     );
   }
 
