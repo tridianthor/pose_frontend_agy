@@ -170,11 +170,16 @@ class _StockAdjustmentDialogState extends ConsumerState<StockAdjustmentDialog> {
               // Product Dropdown Selector
               DropdownButtonFormField<ProductModel>(
                 value: _product,
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Product *'),
                 items: widget.products.map((p) {
                   return DropdownMenuItem(
                     value: p,
-                    child: Text('${p.name} (Stock: ${p.stockQuantity})'),
+                    child: Text(
+                      '${p.name} (Stock: ${p.stockQuantity})',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   );
                 }).toList(),
                 onChanged: (val) {
