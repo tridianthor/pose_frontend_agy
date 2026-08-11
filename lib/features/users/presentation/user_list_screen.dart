@@ -77,23 +77,27 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'User & Role Management',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Manage staff accounts, credentials, and access roles (Admin, Manager, Cashier)',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'User & Role Management',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Manage staff accounts, credentials, and access roles (Admin, Manager, Cashier)',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 16),
                   ElevatedButton.icon(
                     onPressed: () => _openUserForm(),
                     icon: const Icon(Icons.person_add_alt_1_rounded),

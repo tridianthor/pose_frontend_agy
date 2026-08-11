@@ -82,25 +82,21 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Store Settings & Preferences',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Configure store identity, receipt formatting, theme, and security',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                    Text(
+                      'Store Settings & Preferences',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Configure store identity, receipt formatting, theme, and security',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: settings.isSubmitting ? null : _saveSettings,
                       icon: const Icon(Icons.save_rounded),

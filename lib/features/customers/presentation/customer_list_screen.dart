@@ -54,25 +54,27 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Customer Directory',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Manage customer contacts, purchase analytics, and loyalty records',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Customer Directory',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Manage customer contacts, purchase analytics, and loyalty records',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () => _openCustomerForm(),
                     icon: const Icon(Icons.person_add_rounded),
@@ -153,11 +155,16 @@ class _CustomerTile extends StatelessWidget {
           color: customer.isWalkIn ? AppTheme.primaryColor : null,
         ),
       ),
-      title: Row(
+      title: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 4,
         children: [
-          Text(customer.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-          if (customer.isWalkIn) ...[
-            const SizedBox(width: 8),
+          Text(
+            customer.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          if (customer.isWalkIn)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
@@ -167,16 +174,18 @@ class _CustomerTile extends StatelessWidget {
               child: const Text(
                 'SYSTEM DEFAULT',
                 style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.primaryColor),
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
               ),
             ),
-          ],
         ],
       ),
       subtitle: Text(
         'Phone: ${customer.phone ?? "N/A"} • Email: ${customer.email ?? "N/A"}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
