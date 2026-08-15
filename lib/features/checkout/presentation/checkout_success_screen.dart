@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../pos/presentation/pos_catalog_controller.dart';
 import '../../sales/domain/sale_model.dart';
 import 'checkout_controller.dart';
 
@@ -98,6 +99,7 @@ class CheckoutSuccessScreen extends ConsumerWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               ref.read(checkoutControllerProvider.notifier).resetCheckout();
+                              ref.read(posCatalogControllerProvider.notifier).fetchCatalog();
                               if (Navigator.of(context).canPop()) {
                                 Navigator.of(context).pop();
                               }

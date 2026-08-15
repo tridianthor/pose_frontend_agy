@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../pos/presentation/cart_controller.dart';
+import '../../pos/presentation/pos_catalog_controller.dart';
 import 'checkout_controller.dart';
 import 'checkout_success_screen.dart';
 import 'widgets/cash_payment_calculator.dart';
@@ -190,6 +191,7 @@ class CheckoutModal extends ConsumerWidget {
             final completedSale =
                 ref.read(checkoutControllerProvider).completedSale;
             ref.read(cartControllerProvider.notifier).clearCart();
+            ref.read(posCatalogControllerProvider.notifier).fetchCatalog();
             Navigator.of(context).pop(); // Close checkout dialog
 
             if (completedSale != null) {

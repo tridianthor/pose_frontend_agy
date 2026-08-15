@@ -28,6 +28,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(() {
+      if (mounted) {
+        ref.read(posCatalogControllerProvider.notifier).fetchCatalog();
+      }
+    });
   }
 
   @override

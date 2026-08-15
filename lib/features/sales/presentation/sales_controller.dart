@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/errors/failures.dart';
+import '../../inventory/presentation/inventory_controller.dart';
+import '../../pos/presentation/pos_catalog_controller.dart';
+import '../../products/presentation/products_controller.dart';
 import '../data/sales_repository.dart';
 import '../domain/sale_model.dart';
 
@@ -69,13 +72,14 @@ class SalesState {
 final salesControllerProvider =
     StateNotifierProvider<SalesController, SalesState>((ref) {
   final repository = ref.watch(salesRepositoryProvider);
-  return SalesController(repository);
+  return SalesController(repository, ref);
 });
 
 class SalesController extends StateNotifier<SalesState> {
   final SalesRepository repository;
+  final Ref? ref;
 
-  SalesController(this.repository) : super(const SalesState()) {
+  SalesController(this.repository, [this.ref]) : super(const SalesState()) {
     fetchSales();
   }
 
@@ -117,13 +121,24 @@ class SalesController extends StateNotifier<SalesState> {
     try {
       await repository.voidSale(saleId);
       await fetchSales();
-      state = state.copyWith(isSubmitting: false);
+      if (ref != null) {
+        await Future.wait([
+          ref!.read(posCatalogControllerProvider.notifier).fetchCatalog(),
+          ref!.read(productsControllerProvider.notifier).fetchProductsAndCategories(),
+          ref!.read(inventoryControllerProvider.notifier).fetchInventory(),
+        ]);
+      }
+      if (mounted) {
+        state = state.copyWith(isSubmitting: false);
+      }
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSubmitting: false,
-        failure: ServerFailure(message: e.toString()),
-      );
+      if (mounted) {
+        state = state.copyWith(
+          isSubmitting: false,
+          failure: ServerFailure(message: e.toString()),
+        );
+      }
       return false;
     }
   }

@@ -3,10 +3,14 @@ import '../../../core/errors/failures.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../../customers/domain/customer_model.dart';
+import '../../inventory/presentation/inventory_controller.dart';
 import '../../payments/domain/payment_method_model.dart';
 import '../../pos/presentation/cart_controller.dart';
+import '../../pos/presentation/pos_catalog_controller.dart';
+import '../../products/presentation/products_controller.dart';
 import '../../sales/data/sales_repository.dart';
 import '../../sales/domain/sale_model.dart';
+import '../../sales/presentation/sales_controller.dart';
 
 class CheckoutState {
   final CustomerModel selectedCustomer;
@@ -61,14 +65,15 @@ final checkoutControllerProvider =
     StateNotifierProvider<CheckoutController, CheckoutState>((ref) {
   final repository = ref.watch(salesRepositoryProvider);
   final apiClient = ref.watch(apiClientProvider);
-  return CheckoutController(repository, apiClient);
+  return CheckoutController(repository, apiClient, ref);
 });
 
 class CheckoutController extends StateNotifier<CheckoutState> {
   final SalesRepository salesRepository;
   final ApiClient apiClient;
+  final Ref? ref;
 
-  CheckoutController(this.salesRepository, this.apiClient)
+  CheckoutController(this.salesRepository, this.apiClient, [this.ref])
       : super(CheckoutState(selectedCustomer: CustomerModel.walkIn())) {
     loadPaymentMethods();
   }
@@ -99,20 +104,24 @@ class CheckoutController extends StateNotifier<CheckoutState> {
         ];
       }
 
-      state = state.copyWith(
-        paymentMethods: methods,
-        selectedPaymentMethod: methods.first,
-      );
+      if (mounted) {
+        state = state.copyWith(
+          paymentMethods: methods,
+          selectedPaymentMethod: methods.first,
+        );
+      }
     } catch (_) {
-      final fallbackMethods = [
-        const PaymentMethodModel(id: 1, name: 'Cash', code: 'cash'),
-        const PaymentMethodModel(id: 2, name: 'QRIS', code: 'qris'),
-        const PaymentMethodModel(id: 3, name: 'Debit Card', code: 'card'),
-      ];
-      state = state.copyWith(
-        paymentMethods: fallbackMethods,
-        selectedPaymentMethod: fallbackMethods.first,
-      );
+      if (mounted) {
+        final fallbackMethods = [
+          const PaymentMethodModel(id: 1, name: 'Cash', code: 'cash'),
+          const PaymentMethodModel(id: 2, name: 'QRIS', code: 'qris'),
+          const PaymentMethodModel(id: 3, name: 'Debit Card', code: 'card'),
+        ];
+        state = state.copyWith(
+          paymentMethods: fallbackMethods,
+          selectedPaymentMethod: fallbackMethods.first,
+        );
+      }
     }
   }
 
@@ -160,6 +169,17 @@ class CheckoutController extends StateNotifier<CheckoutState> {
         isSubmitting: false,
         completedSale: sale,
       );
+
+      // Trigger cross-module refresh so POS catalog and inventory stock immediately update
+      if (ref != null) {
+        await Future.wait([
+          ref!.read(posCatalogControllerProvider.notifier).fetchCatalog(),
+          ref!.read(productsControllerProvider.notifier).fetchProductsAndCategories(),
+          ref!.read(inventoryControllerProvider.notifier).fetchInventory(),
+          ref!.read(salesControllerProvider.notifier).fetchSales(),
+        ]);
+      }
+
       return true;
     } on Failure catch (failure) {
       state = state.copyWith(

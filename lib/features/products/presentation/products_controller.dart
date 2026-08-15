@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/errors/failures.dart';
+import '../../inventory/presentation/inventory_controller.dart';
+import '../../pos/presentation/pos_catalog_controller.dart';
 import '../data/products_repository.dart';
 import '../domain/category_model.dart';
 import '../domain/product_model.dart';
@@ -65,13 +67,14 @@ class ProductsState {
 final productsControllerProvider =
     StateNotifierProvider<ProductsController, ProductsState>((ref) {
   final repository = ref.watch(productsRepositoryProvider);
-  return ProductsController(repository);
+  return ProductsController(repository, ref);
 });
 
 class ProductsController extends StateNotifier<ProductsState> {
   final ProductsRepository repository;
+  final Ref? ref;
 
-  ProductsController(this.repository) : super(const ProductsState()) {
+  ProductsController(this.repository, [this.ref]) : super(const ProductsState()) {
     fetchProductsAndCategories();
   }
 
@@ -120,13 +123,23 @@ class ProductsController extends StateNotifier<ProductsState> {
       }
 
       await fetchProductsAndCategories();
-      state = state.copyWith(isSubmitting: false);
+      if (ref != null) {
+        await Future.wait([
+          ref!.read(posCatalogControllerProvider.notifier).fetchCatalog(),
+          ref!.read(inventoryControllerProvider.notifier).fetchInventory(),
+        ]);
+      }
+      if (mounted) {
+        state = state.copyWith(isSubmitting: false);
+      }
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSubmitting: false,
-        failure: ServerFailure(message: e.toString()),
-      );
+      if (mounted) {
+        state = state.copyWith(
+          isSubmitting: false,
+          failure: ServerFailure(message: e.toString()),
+        );
+      }
       return false;
     }
   }
@@ -137,14 +150,24 @@ class ProductsController extends StateNotifier<ProductsState> {
       final success = await repository.deactivateProduct(productId);
       if (success) {
         await fetchProductsAndCategories();
+        if (ref != null) {
+          await Future.wait([
+            ref!.read(posCatalogControllerProvider.notifier).fetchCatalog(),
+            ref!.read(inventoryControllerProvider.notifier).fetchInventory(),
+          ]);
+        }
       }
-      state = state.copyWith(isSubmitting: false);
+      if (mounted) {
+        state = state.copyWith(isSubmitting: false);
+      }
       return success;
     } catch (e) {
-      state = state.copyWith(
-        isSubmitting: false,
-        failure: ServerFailure(message: e.toString()),
-      );
+      if (mounted) {
+        state = state.copyWith(
+          isSubmitting: false,
+          failure: ServerFailure(message: e.toString()),
+        );
+      }
       return false;
     }
   }
